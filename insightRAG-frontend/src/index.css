@@ -1,1 +1,117 @@
 @import "tailwindcss";
+/* ===== Custom Checkbox ===== */
+
+.checkbox-wrapper * {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-wrapper label {
+  --size: 28px;
+  --shadow: calc(var(--size) * .07) calc(var(--size) * .1);
+
+  position: relative;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+
+  background-image: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #1e3a8a 100%);
+  border-radius: 50%;
+
+  box-shadow: 0 var(--shadow) rgba(37, 99, 235, 0.4);
+
+  cursor: pointer;
+  transition: 0.2s ease;
+  overflow: hidden;
+}
+
+.checkbox-wrapper label:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+
+  width: 70%;
+  height: 70%;
+  margin: auto;
+
+  background-color: #fff;
+  transform: translateY(-50%);
+  border-radius: 50%;
+
+  box-shadow: inset 0 var(--shadow) rgba(37, 99, 235, 0.3);
+  transition: 0.2s ease;
+}
+
+.checkbox-wrapper label:hover:before {
+  width: 55%;
+  height: 55%;
+}
+
+.checkbox-wrapper label:active {
+  transform: scale(0.9);
+}
+
+/* Tick */
+.checkbox-wrapper .tick_mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 8px;
+  height: 14px;
+
+  border-right: 3px solid white;
+  border-bottom: 3px solid white;
+
+  transform: translate(-50%, -60%) rotate(45deg) scale(0);
+  transition: all 0.2s ease;
+}
+
+.checkbox-wrapper .tick_mark:before {
+  width: 10%;
+  height: 30%;
+  bottom: 0;
+  left: 0;
+}
+
+.checkbox-wrapper .tick_mark:after {
+  width: 100%;
+  height: 10%;
+  bottom: 0;
+  left: 0;
+}
+
+/* Checked */
+.checkbox-wrapper input[type="checkbox"]:checked + label {
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.5);
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + label:before {
+  width: 0;
+  height: 0;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + label .tick_mark {
+  transform: translate(-50%, -60%) rotate(45deg) scale(1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease;
+}

@@ -82,7 +82,7 @@ export default function Dashboard() {
 
   return (
 
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
 
       {/* Sidebar */}
 
@@ -137,50 +137,70 @@ export default function Dashboard() {
 
       {/* Main */}
 
-      <div className="flex-1 grid grid-cols-2 gap-6 p-8">
+      <div className="flex-1 grid grid-cols-3 gap-6 p-8 overflow-hidden">
 
         {/* PDF Library */}
 
-        <div className="bg-white rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 col-span-1 flex flex-col overflow-hidden">
 
           <h2 className="font-semibold mb-4">
             PDF Library
           </h2>
 
-          <PDFUploader onFileUpload={handleFileUpload}/>
+          <PDFUploader onFileUpload={handleFileUpload} />
 
-          <div className="mt-6 space-y-2">
+          {/* Scrollable PDF List */}
+          <div className="flex-1 overflow-y-auto mt-4 pr-2">
+            <div className="space-y-3">
+              {allPDFs.map((pdf, i) => {
+                const isSelected = selectedPDFs.includes(pdf);
 
-            {allPDFs.map((pdf,i)=> (
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition cursor-pointer ${
+                      isSelected
+                        ? "bg-blue-50 border-blue-400"
+                        : "bg-white border-gray-200 hover:bg-gray-50"
+                    }`}
+                    onClick={() => togglePDF(pdf)}
+                  >
+                    <p className="text-sm font-medium text-gray-700 truncate">
+                      {pdf}
+                    </p>
 
-              <label key={i} className="flex items-center gap-2 text-sm">
-
-                <input
-                  type="checkbox"
-                  checked={selectedPDFs.includes(pdf)}
-                  onChange={() => togglePDF(pdf)}
-                />
-
-                {pdf}
-
-              </label>
-
-            ))}
-
+                    <div className="checkbox-wrapper">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => togglePDF(pdf)}
+                        id={`pdf-${i}`}
+                      />
+                      <label htmlFor={`pdf-${i}`}>
+                        <div className="tick_mark"></div>
+                      </label>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <button
-            onClick={initializeChat}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Initialize Chat
-          </button>
+          {/* Button (FIXED AT BOTTOM) */}
+          <div className="pt-4">
+            <button
+              onClick={initializeChat}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition"
+            >
+              Initialize Chat
+            </button>
+          </div>
 
         </div>
 
         {/* Chat */}
 
-        <div className="bg-white rounded-xl p-6">
+        <div className="bg-gradient-to-b from-white to-gray-50 rounded-2xl p-6 col-span-2 flex flex-col overflow-hidden shadow-lg border border-gray-200">
 
           {activeChat ? (
 

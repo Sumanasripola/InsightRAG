@@ -1,79 +1,52 @@
 import faiss
+import numpy as np
 import pickle
 import os
-import numpy as np
+from app.config import FAISS_INDEX_PATH, METADATA_PATH
 
-INDEX_PATH = "vector_db/faiss.index"
-META_PATH = "vector_db/meta.pkl"
+dimension = 384  # for MiniLM
 
-dimension = 384
+# load or create index
+if os.path.exists(FAISS_INDEX_PATH):
+    index = faiss.read_index(FAISS_INDEX_PATH)
+else:
+    index = faiss.IndexFlatL2(dimension)
 
-index = None
-documents = []
-
-# ensure folder exists
-os.makedirs("vector_db", exist_ok=True)
-
-
-def load_index():
-
-    global index, documents
-
-    try:
-
-        if os.path.exists(INDEX_PATH) and os.path.exists(META_PATH):
-
-            index = faiss.read_index(INDEX_PATH)
-
-            with open(META_PATH, "rb") as f:
-                documents = pickle.load(f)
-
-        else:
-
-            index = faiss.IndexFlatL2(dimension)
-            documents = []
-
-    except Exception:
-
-        print("FAISS index corrupted. Creating new index...")
-
-        index = faiss.IndexFlatL2(dimension)
-        documents = []
+# load metadata
+if os.path.exists(METADATA_PATH):
+    with open(METADATA_PATH, "rb") as f:
+        metadata = pickle.load(f)
+else:
+    metadata = []
 
 
-def save_index():
+def add_vectors(vectors, new_metadata):
 
-    faiss.write_index(index, INDEX_PATH)
+    global metadata
 
-    with open(META_PATH, "wb") as f:
-        pickle.dump(documents, f)
+    vectors = np.array(vectors).astype("float32")
 
+    index.add(vectors)
 
-def add_vectors(vectors, texts):
+    metadata.extend(new_metadata)
 
-    index.add(np.array(vectors))
+    # save
+    faiss.write_index(index, FAISS_INDEX_PATH)
 
-    documents.extend(texts)
-
-    save_index()
+    with open(METADATA_PATH, "wb") as f:
+        pickle.dump(metadata, f)
 
 
 def search(query_vector, k=20):
 
-    distances, indices = index.search(
-        np.array([query_vector]), k
-    )
+    query_vector = np.array([query_vector]).astype("float32")
+
+    distances, indices = index.search(query_vector, k)
 
     results = []
 
     for i in indices[0]:
-
-        if i < len(documents):
-
-            results.append(documents[i])
+        if i < len(metadata):
+            results.append(metadata[i])
 
     return results
-
-
-# load index when server starts
-load_index()

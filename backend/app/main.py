@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles   # ✅ FIXED POSITION
+
 from app.api import upload, query
 
 app = FastAPI(
@@ -7,15 +9,20 @@ app = FastAPI(
     version="1.0"
 )
 
-# CORS FIX
+# ✅ STATIC FILES (ORDER FIXED)
+app.mount("/generated_excels", StaticFiles(directory="generated_excels"), name="excels")
+app.mount("/images", StaticFiles(directory="storage/images"), name="images")
+
+# ✅ CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # allow frontend
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ✅ ROUTES
 app.include_router(upload.router)
 app.include_router(query.router)
 
